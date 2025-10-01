@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/config-manager.svg)](https://badge.fury.io/py/config-manager)
 [![Python versions](https://img.shields.io/pypi/pyversions/config-manager.svg)](https://pypi.org/project/config-manager/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/yourusername/config-manager/workflows/Tests/badge.svg)](https://github.com/yourusername/config-manager/actions)
+[![Tests](https://github.com/AI-Advenced/config-manager/workflows/Tests/badge.svg)](https://github.com/AI-Advenced/config-manager/actions)
 
 A professional Python library for managing configuration files with multi-format support, environment-specific configurations, validation, and CLI tools.
 
