@@ -1,0 +1,150 @@
+# External services configuration (TOML format)
+# This file contains configuration for third-party services and integrations
+
+[services]
+# Payment processing
+[services.stripe]
+public_key = "${STRIPE_PUBLIC_KEY}"
+secret_key = "${STRIPE_SECRET_KEY}"
+webhook_secret = "${STRIPE_WEBHOOK_SECRET}"
+currency = "usd"
+capture_method = "automatic"
+
+[services.paypal]
+client_id = "${PAYPAL_CLIENT_ID}"
+client_secret = "${PAYPAL_CLIENT_SECRET}"
+mode = "sandbox"  # sandbox or live
+
+# Email services
+[services.sendgrid]
+api_key = "${SENDGRID_API_KEY}"
+from_email = "noreply@myapp.com"
+templates = { welcome = "d-123456", reset_password = "d-789012" }
+
+[services.mailgun]
+api_key = "${MAILGUN_API_KEY}"
+domain = "mg.myapp.com"
+base_url = "https://api.mailgun.net/v3"
+
+# Cloud storage
+[services.aws]
+access_key_id = "${AWS_ACCESS_KEY_ID}"
+secret_access_key = "${AWS_SECRET_ACCESS_KEY}"
+region = "us-east-1"
+s3_bucket = "myapp-uploads"
+
+[services.cloudinary]
+cloud_name = "${CLOUDINARY_CLOUD_NAME}"
+api_key = "${CLOUDINARY_API_KEY}"
+api_secret = "${CLOUDINARY_API_SECRET}"
+
+# Analytics and monitoring
+[services.google_analytics]
+tracking_id = "${GA_TRACKING_ID}"
+measurement_id = "${GA_MEASUREMENT_ID}"
+
+[services.sentry]
+dsn = "${SENTRY_DSN}"
+environment = "production"
+sample_rate = 1.0
+traces_sample_rate = 0.1
+
+[services.newrelic]
+license_key = "${NEWRELIC_LICENSE_KEY}"
+app_name = "MyApp"
+
+# Social authentication
+[services.oauth]
+[services.oauth.google]
+client_id = "${GOOGLE_OAUTH_CLIENT_ID}"
+client_secret = "${GOOGLE_OAUTH_CLIENT_SECRET}"
+scopes = ["openid", "email", "profile"]
+
+[services.oauth.github]
+client_id = "${GITHUB_OAUTH_CLIENT_ID}"
+client_secret = "${GITHUB_OAUTH_CLIENT_SECRET}"
+scopes = ["user:email"]
+
+[services.oauth.facebook]
+app_id = "${FACEBOOK_APP_ID}"
+app_secret = "${FACEBOOK_APP_SECRET}"
+scopes = ["email", "public_profile"]
+
+# Search and indexing
+[services.elasticsearch]
+host = "localhost"
+port = 9200
+index_prefix = "myapp"
+timeout = 30
+
+[services.algolia]
+app_id = "${ALGOLIA_APP_ID}"
+api_key = "${ALGOLIA_API_KEY}"
+search_key = "${ALGOLIA_SEARCH_KEY}"
+index_name = "myapp_search"
+
+# Message queues and real-time
+[services.rabbitmq]
+host = "localhost"
+port = 5672
+username = "${RABBITMQ_USERNAME}"
+password = "${RABBITMQ_PASSWORD}"
+virtual_host = "myapp"
+
+[services.pusher]
+app_id = "${PUSHER_APP_ID}"
+key = "${PUSHER_KEY}"
+secret = "${PUSHER_SECRET}"
+cluster = "us2"
+encrypted = true
+
+# Environment-specific overrides
+[development]
+[development.services]
+[development.services.stripe]
+public_key = "pk_test_development_key"
+secret_key = "sk_test_development_key"
+
+[development.services.sendgrid]
+api_key = "development_sendgrid_key"
+
+[development.services.sentry]
+environment = "development"
+sample_rate = 0.1
+
+[development.services.elasticsearch]
+host = "localhost"
+port = 9200
+
+[staging]
+[staging.services]
+[staging.services.stripe]
+mode = "test"
+
+[staging.services.sentry]
+environment = "staging"
+sample_rate = 0.5
+
+[staging.services.aws]
+s3_bucket = "myapp-uploads-staging"
+
+[production]
+[production.services]
+[production.services.stripe]
+mode = "live"
+
+[production.services.paypal]
+mode = "live"
+
+[production.services.sentry]
+environment = "production"
+sample_rate = 1.0
+traces_sample_rate = 0.05
+
+[production.services.elasticsearch]
+host = "prod-elasticsearch.example.com"
+port = 9200
+
+[production.services.aws]
+s3_bucket = "myapp-uploads-production"
+region = "us-west-2"

@@ -1,0 +1,517 @@
+Metadata-Version: 2.4
+Name: config-manager
+Version: 1.0.0
+Summary: Professional Python configuration management library with multi-format support
+Author-email: Your Name <your.email@example.com>
+Maintainer-email: Your Name <your.email@example.com>
+License: MIT
+Project-URL: Homepage, https://github.com/yourusername/config-manager
+Project-URL: Repository, https://github.com/yourusername/config-manager
+Project-URL: Documentation, https://config-manager.readthedocs.io
+Project-URL: Bug Reports, https://github.com/yourusername/config-manager/issues
+Project-URL: Source, https://github.com/yourusername/config-manager
+Keywords: configuration,config,settings,yaml,json,toml,environment,validation
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: tomli>=1.2.0; python_version < "3.11"
+Requires-Dist: tomli-w>=1.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=2.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.0.0; extra == "dev"
+Requires-Dist: black>=21.0.0; extra == "dev"
+Requires-Dist: isort>=5.0.0; extra == "dev"
+Requires-Dist: flake8>=3.8.0; extra == "dev"
+Requires-Dist: mypy>=0.800; extra == "dev"
+Requires-Dist: pre-commit>=2.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: sphinx>=4.0.0; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=1.0.0; extra == "docs"
+Requires-Dist: myst-parser>=0.15.0; extra == "docs"
+Provides-Extra: validation
+Requires-Dist: pydantic>=1.8.0; extra == "validation"
+Provides-Extra: all
+Requires-Dist: config-manager[dev,docs,validation]; extra == "all"
+Dynamic: license-file
+
+# Config Manager
+
+[![PyPI version](https://badge.fury.io/py/config-manager.svg)](https://badge.fury.io/py/config-manager)
+[![Python versions](https://img.shields.io/pypi/pyversions/config-manager.svg)](https://pypi.org/project/config-manager/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/yourusername/config-manager/workflows/Tests/badge.svg)](https://github.com/yourusername/config-manager/actions)
+
+A professional Python library for managing configuration files with multi-format support, environment-specific configurations, validation, and CLI tools.
+
+## Features
+
+✅ **Multi-format Support**: YAML, JSON, TOML  
+✅ **Environment Management**: Development, staging, production configurations  
+✅ **Intelligent Merging**: Deep merge with precedence rules  
+✅ **Environment Variables**: Override any config via environment variables  
+✅ **Validation System**: Built-in and custom validation rules  
+✅ **CLI Tools**: Command-line interface for validation and display  
+✅ **Type Safety**: Full type hints and mypy support  
+✅ **Zero Dependencies**: Core functionality with minimal dependencies  
+
+## Quick Start
+
+### Installation
+
+```bash
+pip install config-manager
+```
+
+### Basic Usage
+
+```python
+from config_manager import ConfigManager
+
+# Initialize the configuration manager
+config = ConfigManager()
+
+# Load configuration files (later files override earlier ones)
+config.load_file("config/base.yaml")
+config.load_file("config/database.json")
+config.load_file("config/services.toml")
+
+# Set environment
+config.set_environment("production")
+
+# Apply environment variable overrides
+config.apply_env_overrides()
+
+# Access configuration values
+db_host = config.get("database.host", "localhost")
+api_key = config.get("api.key")
+debug_mode = config.get("app.debug", False)
+
+# Dictionary-style access
+app_name = config["app.name"]
+```
+
+### Environment-Specific Configuration
+
+```yaml
+# config/base.yaml
+app:
+  name: "My Application"
+  debug: false
+
+database:
+  host: "localhost"
+  port: 5432
+
+# Environment-specific overrides
+development:
+  app:
+    debug: true
+  database:
+    name: "myapp_dev"
+
+production:
+  database:
+    host: "prod-db.example.com"
+    ssl: true
+```
+
+```python
+config = ConfigManager()
+config.load_file("config/base.yaml")
+
+# Development environment
+config.set_environment("development")
+print(config.get("app.debug"))  # True
+print(config.get("database.name"))  # "myapp_dev"
+
+# Production environment
+config.set_environment("production")  
+print(config.get("database.host"))  # "prod-db.example.com"
+print(config.get("database.ssl"))   # True
+```
+
+### Environment Variable Overrides
+
+```bash
+export CONFIG_DATABASE_HOST=override-host
+export CONFIG_APP_DEBUG=true
+export CONFIG_API_RATE_LIMIT=5000
+```
+
+```python
+config = ConfigManager()
+config.load_file("config/base.yaml")
+config.apply_env_overrides()
+
+print(config.get("database.host"))    # "override-host"
+print(config.get("app.debug"))        # True
+print(config.get("api.rate_limit"))   # 5000
+```
+
+### Configuration Validation
+
+```python
+config = ConfigManager()
+config.load_file("config/app.yaml")
+
+# Add validation rules
+config.add_validation_rule("database.port", "port")
+config.add_validation_rule("api.url", "url")  
+config.add_validation_rule("admin.email", "email")
+config.add_validation_rule("app.secret_key", "required")
+
+# Custom validation rules
+config.validator.add_min_length_rule("app.secret_key", 16)
+config.validator.add_range_rule("database.pool_size", 1, 100)
+config.validator.add_choices_rule("log.level", ["DEBUG", "INFO", "WARNING", "ERROR"])
+
+# Validate configuration
+errors = config.validate()
+if errors:
+    print("Configuration errors:")
+    for error in errors:
+        print(f"  - {error}")
+else:
+    print("✅ Configuration is valid!")
+```
+
+## CLI Usage
+
+The library includes a powerful command-line interface:
+
+### Validate Configuration
+
+```bash
+# Validate configuration files
+config-manager validate config/base.yaml config/production.json --env production
+
+# Validate with custom rules
+config-manager validate config/*.yaml --rules database.port:port api.url:url
+```
+
+### Display Configuration
+
+```bash
+# Show merged configuration
+config-manager show config/base.yaml config/production.json --env production
+
+# Show specific key
+config-manager show config/app.yaml --key database.host
+
+# Show in different formats
+config-manager show config/*.yaml --format yaml
+config-manager show config/*.yaml --format flat
+```
+
+### Convert Between Formats
+
+```bash
+# Convert YAML to JSON
+config-manager convert config.yaml config.json --format json
+
+# Convert with environment resolution
+config-manager convert app.yaml app-prod.json --env production --format json
+```
+
+### List Configuration Keys
+
+```bash
+# List all configuration keys
+config-manager keys config/*.yaml
+
+# Filter keys by pattern
+config-manager keys config/*.yaml --pattern "database.*"
+
+# Show keys with values
+config-manager keys config/app.yaml --values
+```
+
+## Advanced Usage
+
+### Loading Multiple Files
+
+```python
+config = ConfigManager()
+
+# Load individual files
+config.load_file("config/base.yaml")
+config.load_file("config/database.json") 
+config.load_file("config/services.toml")
+
+# Load entire directory
+config.load_directory("config/", recursive=True)
+
+# Load from dictionary
+config.load_dict({
+    "app": {"name": "MyApp"},
+    "database": {"host": "localhost"}
+})
+```
+
+### Custom Validation Rules
+
+```python
+from config_manager import ValidationRule
+
+def is_valid_log_level(value):
+    valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    return str(value).upper() in valid_levels
+
+# Create custom rule
+log_level_rule = ValidationRule(
+    name="log_level",
+    validator_func=is_valid_log_level,
+    error_message="must be a valid log level",
+    description="Validates log level values"
+)
+
+# Add to validator
+config.add_validation_rule("logging.level", log_level_rule)
+```
+
+### Configuration Management
+
+```python
+# Set values
+config.set("app.version", "2.0.0")
+config.set("feature.new_ui", True)
+
+# Update multiple values
+config.update({
+    "database.timeout": 30,
+    "cache.ttl": 3600
+})
+
+# Check if key exists
+if config.has("optional.feature"):
+    feature_enabled = config.get("optional.feature")
+
+# Delete keys
+config.delete("temporary.setting")
+
+# Save configuration
+config.save_to_file("output/merged-config.yaml", format_override="yaml")
+```
+
+## Configuration File Examples
+
+### YAML Configuration
+
+```yaml
+# config/base.yaml
+app:
+  name: "My Application"
+  version: "1.0.0"
+  debug: false
+
+database:
+  host: "localhost"
+  port: 5432
+  pool_size: 10
+
+api:
+  base_url: "https://api.example.com"
+  timeout: 30
+  rate_limit: 1000
+
+# Environment-specific overrides
+development:
+  app:
+    debug: true
+  database:
+    name: "myapp_dev"
+
+production:
+  database:
+    host: "prod-db.example.com"
+    ssl: true
+    pool_size: 50
+```
+
+### JSON Configuration
+
+```json
+{
+  "database": {
+    "credentials": {
+      "username": "admin",
+      "password": "${DB_PASSWORD}"
+    },
+    "backup": {
+      "enabled": true,
+      "schedule": "0 2 * * *",
+      "retention_days": 30
+    }
+  },
+  "production": {
+    "database": {
+      "backup": {
+        "retention_days": 90
+      }
+    }
+  }
+}
+```
+
+### TOML Configuration
+
+```toml
+[services]
+[services.redis]
+host = "localhost"
+port = 6379
+database = 0
+
+[services.elasticsearch]
+host = "localhost"
+port = 9200
+index_prefix = "myapp"
+
+[production.services]
+[production.services.redis]
+host = "prod-redis.example.com"
+
+[production.services.elasticsearch]  
+host = "prod-search.example.com"
+```
+
+## Environment Variables
+
+All configuration keys can be overridden using environment variables with the `CONFIG_` prefix:
+
+| Environment Variable | Configuration Key | Example Value |
+|---------------------|-------------------|---------------|
+| `CONFIG_DATABASE_HOST` | `database.host` | `prod-db.example.com` |
+| `CONFIG_APP_DEBUG` | `app.debug` | `true` |
+| `CONFIG_API_RATE_LIMIT` | `api.rate_limit` | `5000` |
+| `CONFIG_CACHE_REDIS_HOST` | `cache.redis.host` | `redis-server` |
+
+### Type Conversion
+
+Environment variables are automatically converted to appropriate Python types:
+
+- **Booleans**: `true`, `false`, `yes`, `no`, `1`, `0`, `on`, `off`
+- **Numbers**: `42`, `3.14`, `1.5e10`
+- **Strings**: Everything else
+
+## Built-in Validation Rules
+
+| Rule | Description | Example |
+|------|-------------|---------|
+| `required` | Value must not be empty | `config.add_validation_rule("api.key", "required")` |
+| `url` | Must be a valid URL | `config.add_validation_rule("api.endpoint", "url")` |
+| `email` | Must be a valid email | `config.add_validation_rule("admin.email", "email")` |
+| `port` | Must be a valid port (1-65535) | `config.add_validation_rule("server.port", "port")` |
+
+### Custom Validation Helpers
+
+```python
+# Length validation
+config.validator.add_min_length_rule("password", 8)
+config.validator.add_max_length_rule("username", 50)
+
+# Numeric range validation  
+config.validator.add_range_rule("timeout", 1, 300)
+
+# Choice validation
+config.validator.add_choices_rule("log_level", ["DEBUG", "INFO", "WARNING", "ERROR"])
+```
+
+## API Reference
+
+### ConfigManager
+
+The main class for configuration management.
+
+```python
+ConfigManager(env_var_name: str = 'APP_ENV')
+```
+
+#### Methods
+
+- `load_file(file_path)` - Load configuration from file
+- `load_directory(directory)` - Load all config files from directory  
+- `load_dict(config_dict)` - Load configuration from dictionary
+- `set_environment(environment)` - Set current environment
+- `apply_env_overrides(prefix)` - Apply environment variable overrides
+- `get(key_path, default)` - Get configuration value
+- `set(key_path, value)` - Set configuration value  
+- `has(key_path)` - Check if key exists
+- `validate()` - Validate configuration
+- `save_to_file(file_path)` - Save configuration to file
+
+### Environment
+
+Enumeration of supported environments:
+
+- `Environment.DEVELOPMENT`
+- `Environment.STAGING` 
+- `Environment.PRODUCTION`
+- `Environment.TESTING`
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/config-manager.git
+cd config-manager
+
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Install pre-commit hooks
+pre-commit install
+
+# Run tests
+pytest
+
+# Run tests with coverage
+pytest --cov=config_manager --cov-report=html
+
+# Format code
+black config_manager tests
+isort config_manager tests
+
+# Type checking
+mypy config_manager
+```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
+
+## Support
+
+- 📖 [Documentation](https://config-manager.readthedocs.io)
+- 🐛 [Issue Tracker](https://github.com/yourusername/config-manager/issues)
+- 💬 [Discussions](https://github.com/yourusername/config-manager/discussions)
+
+## Related Projects
+
+- [python-dotenv](https://github.com/theskumar/python-dotenv) - Load environment variables from .env files
+- [dynaconf](https://github.com/rochacbruno/dynaconf) - Configuration management for Python
+- [hydra](https://github.com/facebookresearch/hydra) - Framework for elegantly configuring complex applications

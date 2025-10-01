@@ -1,0 +1,30 @@
+# Include important files in the distribution
+include README.md
+include LICENSE
+include CHANGELOG.md
+include pyproject.toml
+include requirements.txt
+include requirements-dev.txt
+
+# Include examples
+recursive-include examples *.py *.yaml *.yml *.json *.toml *.md
+
+# Include tests (optional, for source distributions)
+recursive-include tests *.py
+
+# Include documentation
+recursive-include docs *.md *.rst *.txt *.py
+prune docs/_build
+
+# Exclude development and cache files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude .pytest_cache
+global-exclude .mypy_cache
+global-exclude *.egg-info
+prune .git
+prune .github
+exclude .gitignore
+exclude .pre-commit-config.yaml
+exclude tox.ini

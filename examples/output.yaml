@@ -1,0 +1,118 @@
+app:
+  name: My Application
+  version: 1.0.0
+  debug: true
+  secret_key: dev-secret-key-not-secure
+  timezone: UTC
+  features:
+    user_registration: true
+    email_notifications: true
+    premium_features: false
+    maintenance_mode: false
+  new_feature: true
+  maintenance_mode: true
+database:
+  host: localhost
+  port: 5432
+  name: myapp_dev
+  user: postgres
+  password: ${DB_PASSWORD}
+  pool_size: 10
+  timeout: 30
+  ssl: false
+  options:
+    connect_timeout: 10
+    command_timeout: 30
+    retry_attempts: 3
+api:
+  base_url: https://api.example.com
+  version: v1
+  timeout: 30
+  rate_limit: 1000
+  auth:
+    method: bearer
+    token_expiry: 3600
+logging:
+  level: DEBUG
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: ./logs/dev.log
+  max_size: 20MB
+  backup_count: 5
+  loggers:
+    database: DEBUG
+    api: INFO
+    security: WARNING
+cache:
+  type: redis
+  host: localhost
+  port: 6379
+  database: 0
+  ttl: 7200
+email:
+  smtp:
+    host: smtp.gmail.com
+    port: 587
+    use_tls: true
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+  from_address: noreply@myapp.com
+  from_name: My Application
+security:
+  password_min_length: 8
+  session_timeout: 1800
+  max_login_attempts: 5
+  lockout_duration: 900
+  cors:
+    allowed_origins:
+    - http://localhost:3000
+    - http://localhost:8080
+    allowed_methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    allowed_headers:
+    - Content-Type
+    - Authorization
+staging:
+  app:
+    debug: false
+  database:
+    name: myapp_staging
+    host: staging-db.internal.com
+    ssl: true
+    pool_size: 5
+  api:
+    base_url: https://staging-api.example.com
+    rate_limit: 500
+  logging:
+    level: INFO
+    file: /var/log/myapp-staging.log
+  cache:
+    host: staging-redis.internal.com
+production:
+  app:
+    features:
+      premium_features: true
+  database:
+    name: myapp_production
+    host: prod-db.example.com
+    ssl: true
+    pool_size: 50
+  api:
+    base_url: https://api.example.com
+    rate_limit: 10000
+  logging:
+    level: WARNING
+    file: /var/log/myapp-production.log
+  cache:
+    host: prod-redis.example.com
+    ttl: 7200
+  security:
+    cors:
+      allowed_origins:
+      - https://myapp.com
+      - https://www.myapp.com
+custom:
+  nested:
+    value: custom setting

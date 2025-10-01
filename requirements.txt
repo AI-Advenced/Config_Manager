@@ -1,0 +1,11 @@
+# Core dependencies for config-manager
+# These are the minimum required packages for the library to function
+
+# YAML support
+PyYAML>=6.0
+
+# TOML support for Python < 3.11 (3.11+ has built-in tomllib)
+tomli>=1.2.0;python_version<'3.11'
+
+# TOML writing support (tomllib in 3.11+ is read-only)
+tomli-w>=1.0.0

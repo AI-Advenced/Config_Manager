@@ -1,0 +1,97 @@
+{
+  "database": {
+    "migrations": {
+      "enabled": true,
+      "auto_run": false,
+      "directory": "./migrations",
+      "table_name": "schema_migrations"
+    },
+    "backup": {
+      "enabled": true,
+      "schedule": "0 2 * * *",
+      "retention_days": 30,
+      "s3_bucket": "${BACKUP_S3_BUCKET}",
+      "compression": true
+    },
+    "monitoring": {
+      "slow_query_threshold": 5.0,
+      "connection_pool_monitoring": true,
+      "metrics_enabled": true
+    },
+    "connection_pools": {
+      "read_replica": {
+        "host": "${DB_READ_HOST}",
+        "port": 5432,
+        "pool_size": 20,
+        "max_overflow": 10
+      },
+      "analytics": {
+        "host": "${DB_ANALYTICS_HOST}",
+        "port": 5432,
+        "database": "analytics_db",
+        "pool_size": 5
+      }
+    }
+  },
+  
+  "development": {
+    "database": {
+      "migrations": {
+        "auto_run": true
+      },
+      "backup": {
+        "enabled": false
+      },
+      "connection_pools": {
+        "read_replica": null,
+        "analytics": null
+      }
+    }
+  },
+  
+  "staging": {
+    "database": {
+      "migrations": {
+        "auto_run": false
+      },
+      "backup": {
+        "enabled": true,
+        "retention_days": 7
+      },
+      "connection_pools": {
+        "read_replica": {
+          "host": "staging-read-replica.internal.com",
+          "pool_size": 10
+        }
+      }
+    }
+  },
+  
+  "production": {
+    "database": {
+      "migrations": {
+        "auto_run": false
+      },
+      "backup": {
+        "enabled": true,
+        "retention_days": 90,
+        "schedule": "0 1,13 * * *"
+      },
+      "monitoring": {
+        "slow_query_threshold": 2.0,
+        "alert_threshold": 1000
+      },
+      "connection_pools": {
+        "read_replica": {
+          "host": "prod-read-replica.example.com",
+          "pool_size": 30,
+          "max_overflow": 20
+        },
+        "analytics": {
+          "host": "prod-analytics-db.example.com",
+          "pool_size": 15
+        }
+      }
+    }
+  }
+}

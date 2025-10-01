@@ -1,0 +1,26 @@
+PyYAML>=6.0
+tomli-w>=1.0.0
+
+[:python_version < "3.11"]
+tomli>=1.2.0
+
+[all]
+config-manager[dev,docs,validation]
+
+[dev]
+pytest>=6.0.0
+pytest-cov>=2.0.0
+pytest-mock>=3.0.0
+black>=21.0.0
+isort>=5.0.0
+flake8>=3.8.0
+mypy>=0.800
+pre-commit>=2.0.0
+
+[docs]
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+myst-parser>=0.15.0
+
+[validation]
+pydantic>=1.8.0

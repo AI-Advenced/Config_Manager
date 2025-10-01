@@ -1,0 +1,167 @@
+# Base configuration file (YAML format)
+# This serves as the foundation configuration that applies to all environments
+
+app:
+  name: "My Application"
+  version: "1.0.0"
+  debug: false
+  secret_key: "${APP_SECRET_KEY}"
+  timezone: "UTC"
+  
+  # Feature flags
+  features:
+    user_registration: true
+    email_notifications: true
+    premium_features: false
+    maintenance_mode: false
+
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  name: "myapp"
+  user: "postgres"
+  password: "${DB_PASSWORD}"
+  pool_size: 10
+  timeout: 30
+  ssl: false
+  
+  # Connection options
+  options:
+    connect_timeout: 10
+    command_timeout: 30
+    retry_attempts: 3
+
+# API configuration  
+api:
+  base_url: "https://api.example.com"
+  version: "v1"
+  timeout: 30
+  rate_limit: 1000
+  
+  # Authentication
+  auth:
+    method: "bearer"
+    token_expiry: 3600
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "/var/log/myapp.log"
+  max_size: "10MB"
+  backup_count: 5
+  
+  # Loggers
+  loggers:
+    database: "DEBUG"
+    api: "INFO"
+    security: "WARNING"
+
+# Cache configuration
+cache:
+  type: "redis"
+  host: "localhost"
+  port: 6379
+  database: 0
+  ttl: 3600
+  
+# Email configuration
+email:
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    use_tls: true
+    username: "${EMAIL_USERNAME}"
+    password: "${EMAIL_PASSWORD}"
+  
+  from_address: "noreply@myapp.com"
+  from_name: "My Application"
+
+# Security settings
+security:
+  password_min_length: 8
+  session_timeout: 1800
+  max_login_attempts: 5
+  lockout_duration: 900
+  
+  # CORS settings
+  cors:
+    allowed_origins: ["http://localhost:3000"]
+    allowed_methods: ["GET", "POST", "PUT", "DELETE"]
+    allowed_headers: ["Content-Type", "Authorization"]
+
+# Environment-specific configurations
+# These will override the base configuration for specific environments
+
+development:
+  app:
+    debug: true
+    secret_key: "dev-secret-key-not-secure"
+  
+  database:
+    name: "myapp_dev"
+    host: "localhost"
+    ssl: false
+  
+  logging:
+    level: "DEBUG"
+    file: "./logs/dev.log"
+  
+  cache:
+    host: "localhost"
+  
+  security:
+    cors:
+      allowed_origins: ["http://localhost:3000", "http://localhost:8080"]
+
+staging:
+  app:
+    debug: false
+    
+  database:
+    name: "myapp_staging"
+    host: "staging-db.internal.com"
+    ssl: true
+    pool_size: 5
+  
+  api:
+    base_url: "https://staging-api.example.com"
+    rate_limit: 500
+  
+  logging:
+    level: "INFO"
+    file: "/var/log/myapp-staging.log"
+  
+  cache:
+    host: "staging-redis.internal.com"
+
+production:
+  app:
+    debug: false
+    
+  database:
+    name: "myapp_production"
+    host: "prod-db.example.com"
+    ssl: true
+    pool_size: 50
+    
+  api:
+    base_url: "https://api.example.com"
+    rate_limit: 10000
+  
+  logging:
+    level: "WARNING"
+    file: "/var/log/myapp-production.log"
+  
+  cache:
+    host: "prod-redis.example.com"
+    ttl: 7200
+  
+  app:
+    features:
+      premium_features: true
+  
+  security:
+    cors:
+      allowed_origins: ["https://myapp.com", "https://www.myapp.com"]
